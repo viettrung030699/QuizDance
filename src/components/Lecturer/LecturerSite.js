@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { Link, Redirect, Router } from "react-router-dom";
 import "./LecturerSite.scss";
 
-const countDownFunction = (countDown) => {
-  for (let i = countDown; i <= 0; i--) {
-    console.log(countDown--);
-  }
-};
+
 
 export const LecturerView = () => {
   const onCancel = () => {
