@@ -2,11 +2,17 @@ import React, { useState } from "react";
 import { Link, Redirect, Router } from "react-router-dom";
 import "./LecturerSite.scss";
 
-const onCancel = () => {
-  localStorage.clear();
+const countDownFunction = (countDown) => {
+  for (let i = countDown; i <= 0; i--) {
+    console.log(countDown--);
+  }
 };
 
 export const LecturerView = () => {
+  const onCancel = () => {
+    localStorage.setItem("user", false);
+  };
+  
   const questions = [
     {
       questionText: "What is the capital of France?",
@@ -16,6 +22,7 @@ export const LecturerView = () => {
         { answerText: "Paris", isCorrect: true },
         { answerText: "Dublin", isCorrect: false },
       ],
+      countDown: 10,
     },
     {
       questionText: "Who is CEO of Tesla?",
@@ -25,6 +32,7 @@ export const LecturerView = () => {
         { answerText: "Bill Gates", isCorrect: false },
         { answerText: "Tony Stark", isCorrect: false },
       ],
+      countDown: 15,
     },
     {
       questionText: "The iPhone was created by which company?",
@@ -34,6 +42,7 @@ export const LecturerView = () => {
         { answerText: "Amazon", isCorrect: false },
         { answerText: "Microsoft", isCorrect: false },
       ],
+      countDown: 15,
     },
     {
       questionText: "How many Harry Potter books are there?",
@@ -43,6 +52,7 @@ export const LecturerView = () => {
         { answerText: "6", isCorrect: false },
         { answerText: "7", isCorrect: true },
       ],
+      countDown: 20,
     },
   ];
 
@@ -69,9 +79,11 @@ export const LecturerView = () => {
         {showScore ? (
           <div className="score-section">
             You scored {score} out of {questions.length}
-            <button onClick={onCancel}>
-              Cancel
-            </button>
+            <div className="cancel-btn">
+              <Link to="/" onClick={onCancel}>
+                Cancel
+              </Link>
+            </div>
           </div>
         ) : (
           <>
@@ -80,6 +92,9 @@ export const LecturerView = () => {
                 <span>Question {currentQuestion + 1}</span>/{questions.length}
               </div>
               <div className="question-text">
+                {/* <div className="question-countDown">
+                  {questions[currentQuestion].countDown}
+                </div> */}
                 {questions[currentQuestion].questionText}
               </div>
             </div>

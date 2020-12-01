@@ -1,14 +1,18 @@
 import React from "react";
+import axios from "axios";
 import { Redirect } from "react-router-dom";
 
 import "./Homepage.scss";
 import { Footer } from "../components/footer/FooterPage";
+import { asyncFunc } from "../services/api";
 
 const onLogin = () => {
   const id = document.getElementById("gameID").value;
+  console.log(asyncFunc(id));
   if (id === "123") {
     return localStorage.setItem("user", true);
   } else {
+    alert("Wrong ID");
     console.log("abcs");
   }
 };
