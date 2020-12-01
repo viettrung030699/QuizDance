@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-import { Link, Redirect, Router } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./LecturerSite.scss";
-
-
 
 export const LecturerView = () => {
   const onCancel = () => {
     localStorage.setItem("user", false);
   };
-  
+
   const questions = [
     {
       questionText: "What is the capital of France?",
@@ -18,7 +16,6 @@ export const LecturerView = () => {
         { answerText: "Paris", isCorrect: true },
         { answerText: "Dublin", isCorrect: false },
       ],
-      countDown: 10,
     },
     {
       questionText: "Who is CEO of Tesla?",
@@ -28,7 +25,6 @@ export const LecturerView = () => {
         { answerText: "Bill Gates", isCorrect: false },
         { answerText: "Tony Stark", isCorrect: false },
       ],
-      countDown: 15,
     },
     {
       questionText: "The iPhone was created by which company?",
@@ -38,7 +34,6 @@ export const LecturerView = () => {
         { answerText: "Amazon", isCorrect: false },
         { answerText: "Microsoft", isCorrect: false },
       ],
-      countDown: 15,
     },
     {
       questionText: "How many Harry Potter books are there?",
@@ -48,23 +43,50 @@ export const LecturerView = () => {
         { answerText: "6", isCorrect: false },
         { answerText: "7", isCorrect: true },
       ],
-      countDown: 20,
+    },
+    {
+      questionText: "1 + 1 = ? ",
+      answerOptions: [
+        { answerText: "1", isCorrect: false },
+        { answerText: "2", isCorrect: true },
+        { answerText: "3", isCorrect: false },
+        { answerText: "4", isCorrect: false },
+      ],
     },
   ];
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
+  const [currentTime, setSeconds] = useState(15);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentTime > 0) {
+        setSeconds((seconds) => {
+          if (seconds > 0) {
+            return seconds - 1;
+          } else {
+            return (seconds = 15);
+          }
+        });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentTime]);
   const handleAnswerOptionClick = (isCorrect) => {
+    let time = 15;
+    setSeconds(time);
+    const nextQuestion = currentQuestion + 1;
+
     if (isCorrect) {
       setScore(score + 1);
     }
 
-    const nextQuestion = currentQuestion + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestion(nextQuestion);
     } else {
       setShowScore(true);
+      localStorage.setItem("result", score+1);
     }
   };
   return (
@@ -85,12 +107,10 @@ export const LecturerView = () => {
           <>
             <div className="question-section">
               <div className="question-count">
+                {currentTime}
                 <span>Question {currentQuestion + 1}</span>/{questions.length}
               </div>
               <div className="question-text">
-                {/* <div className="question-countDown">
-                  {questions[currentQuestion].countDown}
-                </div> */}
                 {questions[currentQuestion].questionText}
               </div>
             </div>
