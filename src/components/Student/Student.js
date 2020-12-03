@@ -9,12 +9,14 @@ export const Student = () => {
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios(
-        "https://quizdance.herokuapp.com/api/search-student-class/".concat(classId)
+        "https://quizdance.herokuapp.com/api/search-student-class/".concat(
+          classId
+        )
       );
       setData(result.data);
     };
     fetchData();
-  }, []);
+  }, [classId]);
 
   const listStudent = Object.values(data);
   return (

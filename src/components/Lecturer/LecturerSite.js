@@ -5,6 +5,20 @@ import "./LecturerSite.scss";
 export const LecturerView = () => {
   const onCancel = () => {
     localStorage.setItem("user", false);
+    console.log("demooo");
+    const axios = require("axios").default;
+    axios({
+      method: "post",
+      url: "https://quizdance.herokuapp.com/api/new-record/",
+      data: {
+        attendance: true,
+        quizPts: localStorage.getItem("result"),
+        studentId: localStorage.getItem("id"),
+        sessionId: localStorage.getItem("sessionId"),
+      },
+    }).then(function (response) {
+      console.log(response.data);
+    });
   };
 
   const questions = [

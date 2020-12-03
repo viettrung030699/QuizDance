@@ -24,13 +24,12 @@ export const Homepage = () => {
   }
   const onLogin = () => {
     const id = document.getElementById("gameID").value;
-    // data.map((item) =>
-    //   id === item.id ? localStorage.setItem("user", true) : console.log("abc")
-    // );
-    data.forEach(element => {
-      if(element.id === id) {
+
+    data.forEach((element) => {
+      if (element.id === id) {
         localStorage.setItem("user", true);
         localStorage.setItem("classId", element.classId);
+        localStorage.setItem("sessionId", id);
       } else {
         console.log("abs");
       }
