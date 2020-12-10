@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 import { Link } from "react-router-dom";
 import "./LecturerSite.scss";
 
+const url = "https://quizdance.herokuapp.com";
+
 export const LecturerView = () => {
+  const axios = require("axios").default;
+
   const onCancel = () => {
     localStorage.setItem("user", false);
     console.log("demooo");
-    const axios = require("axios").default;
     axios({
       method: "post",
       url: "https://quizdance.herokuapp.com/api/new-record/",
@@ -17,9 +21,24 @@ export const LecturerView = () => {
         sessionId: localStorage.getItem("sessionId"),
       },
     }).then(function (response) {
-      console.log(response.data);
-    });
+      console.log(response);
+      localStorage.clear();
+    }).catch((console.error()));
   };
+
+  // axios({
+  //   method: "get",
+  //   url: "https://quizdance.herokuapp.com/api/new-record/",
+  //   data: {
+  //     attendance: true,
+  //     quizPts: localStorage.getItem("result"),
+  //     studentId: localStorage.getItem("id"),
+  //     sessionId: localStorage.getItem("sessionId"),
+  //   },
+  // }).then(function (response) {
+  //   console.log(response.data);
+  //   localStorage.clear();
+  // });
 
   const questions = [
     {
@@ -77,11 +96,12 @@ export const LecturerView = () => {
     const interval = setInterval(() => {
       if (currentTime > 0) {
         setSeconds((seconds) => {
-          if (seconds > 0) {
-            return seconds - 1;
-          } else {
-            return (seconds = 15);
-          }
+          // if (seconds > 0) {
+          //   return seconds - 1;
+          // } else {
+          //   return (seconds = 15);
+          // }
+          return seconds > 0 ? seconds - 1 : (seconds = 15);
         });
       }
     }, 1000);
@@ -100,7 +120,7 @@ export const LecturerView = () => {
       setCurrentQuestion(nextQuestion);
     } else {
       setShowScore(true);
-      localStorage.setItem("result", score+1);
+      localStorage.setItem("result", score + 1);
     }
   };
   return (
