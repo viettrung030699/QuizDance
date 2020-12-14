@@ -6,6 +6,7 @@ import { Layout } from 'antd';
 
 import AntMenu from '../../components/Management/Menu/AntMenu'
 import Classes from './Classes/Classes';
+import Sessions from './Sessions/Sessions';
 
 const { Header, Content, Footer } = Layout;
 
@@ -22,7 +23,7 @@ class Management extends React.Component {
             <Switch>
               <Route path={`${path}`} exact component={()=><h1>This will be the dashboard</h1>} />
               <Route path={`${path}/classes`} exact component={Classes} />
-              <Route path={`${path}/sessions`} />
+              <Route path={`${path}/sessions`} exact component={Sessions} />
               <Route path={`${path}/reports`} exact />
             </Switch>
           </Content>
