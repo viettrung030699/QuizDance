@@ -1,106 +1,53 @@
 import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
 import { Link } from "react-router-dom";
 import "./LecturerSite.scss";
 
-const url = "https://quizdance.herokuapp.com";
+const axios = require("axios").default;
 
-export const LecturerView = () => {
-  const axios = require("axios").default;
-
-  const onCancel = () => {
-    localStorage.setItem("user", false);
-    console.log("demooo");
-    axios({
-      method: "post",
-      url: "https://quizdance.herokuapp.com/api/new-record/",
-      data: {
-        attendance: true,
-        quizPts: localStorage.getItem("result"),
-        studentId: localStorage.getItem("id"),
-        sessionId: localStorage.getItem("sessionId"),
-      },
-    }).then(function (response) {
-      console.log(response);
+const onCancel = () => {
+  localStorage.setItem("user", false);
+  console.log("finish post");
+  axios({
+    method: "post",
+    url: "https://quizdance.herokuapp.com/api/new-record/",
+    data: {
+      attendance: true,
+      quizPts: localStorage.getItem("result"),
+      studentId: localStorage.getItem("id"),
+      sessionId: localStorage.getItem("sessionId"),
+    },
+  })
+    .then(function (response) {
+      alert("Finish");
+      //console.log(response);
       localStorage.clear();
-    }).catch((console.error()));
-  };
-
-  // axios({
-  //   method: "get",
-  //   url: "https://quizdance.herokuapp.com/api/new-record/",
-  //   data: {
-  //     attendance: true,
-  //     quizPts: localStorage.getItem("result"),
-  //     studentId: localStorage.getItem("id"),
-  //     sessionId: localStorage.getItem("sessionId"),
-  //   },
-  // }).then(function (response) {
-  //   console.log(response.data);
-  //   localStorage.clear();
-  // });
-
-  const questions = [
-    {
-      questionText: "What is the capital of France?",
-      answerOptions: [
-        { answerText: "New York", isCorrect: false },
-        { answerText: "London", isCorrect: false },
-        { answerText: "Paris", isCorrect: true },
-        { answerText: "Dublin", isCorrect: false },
-      ],
-    },
-    {
-      questionText: "Who is CEO of Tesla?",
-      answerOptions: [
-        { answerText: "Jeff Bezos", isCorrect: false },
-        { answerText: "Elon Musk", isCorrect: true },
-        { answerText: "Bill Gates", isCorrect: false },
-        { answerText: "Tony Stark", isCorrect: false },
-      ],
-    },
-    {
-      questionText: "The iPhone was created by which company?",
-      answerOptions: [
-        { answerText: "Apple", isCorrect: true },
-        { answerText: "Intel", isCorrect: false },
-        { answerText: "Amazon", isCorrect: false },
-        { answerText: "Microsoft", isCorrect: false },
-      ],
-    },
-    {
-      questionText: "How many Harry Potter books are there?",
-      answerOptions: [
-        { answerText: "1", isCorrect: false },
-        { answerText: "4", isCorrect: false },
-        { answerText: "6", isCorrect: false },
-        { answerText: "7", isCorrect: true },
-      ],
-    },
-    {
-      questionText: "1 + 1 = ? ",
-      answerOptions: [
-        { answerText: "1", isCorrect: false },
-        { answerText: "2", isCorrect: true },
-        { answerText: "3", isCorrect: false },
-        { answerText: "4", isCorrect: false },
-      ],
-    },
-  ];
-
+    })
+    .catch(console.error());
+};
+export const LecturerView = () => {
+  
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
   const [currentTime, setSeconds] = useState(15);
+  const [list, setList] = useState();
+  const [checklist, setChecklist] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios(
+        "https://quizdance.herokuapp.com/api/list-question/".concat(
+          localStorage.getItem("sessionId")
+        )
+      );
+      setList(result.data);
+      setChecklist(true);
+    };
+    fetchData();
+  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       if (currentTime > 0) {
         setSeconds((seconds) => {
-          // if (seconds > 0) {
-          //   return seconds - 1;
-          // } else {
-          //   return (seconds = 15);
-          // }
           return seconds > 0 ? seconds - 1 : (seconds = 15);
         });
       }
@@ -116,11 +63,11 @@ export const LecturerView = () => {
       setScore(score + 1);
     }
 
-    if (nextQuestion < questions.length) {
+    if (nextQuestion < list.length) {
       setCurrentQuestion(nextQuestion);
     } else {
       setShowScore(true);
-      localStorage.setItem("result", score + 1);
+      localStorage.setItem("result", score * 10);
     }
   };
   return (
@@ -130,37 +77,37 @@ export const LecturerView = () => {
       score when the user has answered all the questions */}
         {showScore ? (
           <div className="score-section">
-            You scored {score} out of {questions.length}
+            You scored {score} out of {list.length}
             <div className="cancel-btn">
               <Link to="/" onClick={onCancel}>
                 Cancel
               </Link>
             </div>
           </div>
-        ) : (
+        ) : checklist ? (
           <>
             <div className="question-section">
               <div className="question-count">
                 {currentTime}
-                <span>Question {currentQuestion + 1}</span>/{questions.length}
+                <span>Question {currentQuestion + 1}</span>/{list.length}
               </div>
               <div className="question-text">
-                {questions[currentQuestion].questionText}
+                {list[currentQuestion].question}
               </div>
             </div>
             <div className="answer-section">
-              {questions[currentQuestion].answerOptions.map((answerOption) => (
+              {list[currentQuestion].answers.map((answers) => (
                 <button
-                  key={answerOption.answerText}
-                  onClick={() =>
-                    handleAnswerOptionClick(answerOption.isCorrect)
-                  }
+                  key={answers.answerText}
+                  onClick={() => handleAnswerOptionClick(answers.isCorrect)}
                 >
-                  {answerOption.answerText}
+                  {answers.answerText}
                 </button>
               ))}
             </div>
           </>
+        ) : (
+          console.log("false")
         )}
       </div>
     </div>
