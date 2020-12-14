@@ -1,6 +1,7 @@
 import axios from "axios";
-import { useState } from "react";
 
-const API = {};
+const API = axios.create({
+  baseURL: 'https://quizdance.herokuapp.com/api'
+});
 
 export { API };
