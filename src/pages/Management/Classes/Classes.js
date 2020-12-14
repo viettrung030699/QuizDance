@@ -36,7 +36,7 @@ export default class Classes extends Component {
         const { classData, loading } = this.state
         return (
             <div>
-                <Breadcrumb style={{margin:'1rem 0'}}>
+                <Breadcrumb style={{ margin: '1rem 0' }}>
                     <Breadcrumb.Item>
                         <Link to='/admin'>Admin</Link>
                     </Breadcrumb.Item>
