@@ -1,54 +1,108 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Table, Breadcrumb, Space } from 'antd'
+import { Table, Breadcrumb, Space, Button, Divider, Spin, List, Modal } from 'antd'
 import Column from 'antd/lib/table/Column'
+import { SmileTwoTone, HeartTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 
 import { API } from '../../../services/api'
 
 class Sessions extends Component {
   state = {
     sessionData: [],
-    loading: false
+    loading: false,
+    isModalOpen: false,
+    modalLoading: false,
+    viewedSessionId: '',
+    viewedSessionData: []
   }
 
   componentDidMount() {
-    this.fetchData()
+    this.fetchData(this.props.match.params.classId)
   }
 
-  fetchData = async () => {
+  fetchData = async (classId) => {
     this.setState({ loading: true })
-    const result = await API.get('/all-session')
-    this.setState({ sessionData: result.data.map(s => s.useQuiz ? {...s, useQuiz: "Yes"} : {...s, useQuiz: "No"}), loading: false })
+    const result = await API.get(`/search-session-class/${classId}`)
+    const mappedResult = Object.values(result.data).map(s => s.useQuiz ? { ...s, useQuiz: "Yes" } : { ...s, useQuiz: "No" })
+    this.setState({ sessionData: mappedResult, loading: false })
+  }
+
+  toggleModal = async (sessionId) => {
+    this.setState({ isModalOpen: !this.state.isModalOpen })
+    if (sessionId !== this.state.viewedSessionId) {
+      this.setState({ modalLoading: true })
+      const result = await API.get(`/list-question/${sessionId}`)
+      this.setState({
+        viewedSessionId: sessionId,
+        viewedSessionData: result.data,
+        modalLoading: false
+      })
+    }
   }
 
   render() {
-    const { sessionData, loading } = this.state
+    const { sessionData, loading, isModalOpen, modalLoading, viewedSessionId, viewedSessionData } = this.state
+    console.log(viewedSessionData)
+    const table = (
+      <Table dataSource={sessionData} loading={loading} pagination={true} rowKey='id'>
+        <Column title='Session Id' dataIndex='id' key='id' />
+        <Column title='Week Number' dataIndex='weekNo' key='weekNo'
+          defaultSortOrder='ascend'
+          sorter={(a, b) => a.weekNo - b.weekNo}
+        />
+        <Column title='Quiz' dataIndex='useQuiz' key='useQuiz' />
+        <Column title="Action" key="action"
+          render={(text, record) => (
+            <Space size="middle">
+              <Button type='link' onClick={() => this.toggleModal(record.id)}>View Question</Button>
+              <a href='/delete'>Delete</a>
+            </Space>
+          )}
+        />
+      </Table>
+    )
+
+    const sessionDetail = (
+      !modalLoading &&
+        <Modal style={{top:'0'}} width={1000} visible={isModalOpen} onOk={this.toggleModal} onCancel={this.toggleModal}>
+          <Divider orientation="left">{viewedSessionId} questions</Divider>
+          <List
+            grid={{ gutter: 16, column: 4 }}
+            dataSource={viewedSessionData}
+            renderItem={data => (
+              <List.Item>
+                <h6>{data.question}</h6>
+                <List
+                  dataSource={data.answers}
+                  renderItem={answer => (
+                    <List.Item>
+                      <p>{answer.answerText}</p>
+                      {
+                        answer.isCorrect && <CheckCircleTwoTone twoToneColor="#52c41a" />
+                      }
+                    </List.Item>
+                  )}
+                />
+              </List.Item>
+            )}
+          />
+        </Modal>
+    )
+
     return (
       <div>
         <Breadcrumb style={{ margin: '1rem 0' }}>
           <Breadcrumb.Item>
             <Link to='/admin'>Admin</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>Sessions</Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to='/admin/classes'>Classes</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>{this.props.match.params.classId} Sessions</Breadcrumb.Item>
         </Breadcrumb>
-        <Table dataSource={sessionData} loading={loading} pagination={true} >
-          <Column title='Session Id' dataIndex='id' key='id' />
-          <Column title='Week Number' dataIndex='weekNo' key='weekNo'
-            defaultSortOrder='ascend'
-            sorter={(a, b) => a.weekNo - b.weekNo}
-          />
-          <Column title='Quiz' dataIndex='useQuiz' key='useQuiz' />
-          <Column title='Class Id' dataIndex='classId' key='classId' />
-          <Column title="Action" key="action"
-            render={(text, record) => (
-              <Space size="middle">
-                <Link to='/admin/sessions'>View detail</Link>
-                <a href='/delete'>Delete</a>
-              </Space>
-            )}
-          />
-        </Table>
+        {table}
+        {sessionDetail}
       </div>
     )
   }

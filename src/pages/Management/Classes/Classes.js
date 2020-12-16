@@ -20,7 +20,7 @@ export default class Classes extends Component {
     state = {
         classData: [],
         loading: false,
-        isModalOpen: true
+        isModalOpen: false
     }
 
     componentDidMount() {
@@ -49,7 +49,7 @@ export default class Classes extends Component {
     render() {
         const { classData, loading, isModalOpen } = this.state
         const table = (
-            <Table dataSource={classData} loading={loading} pagination={true} >
+            <Table dataSource={classData} loading={loading} pagination={true} rowKey='id'>
                 <Column title='Class Id' dataIndex='id' key='id' />
                 <Column title='Type' dataIndex='classType' key='classType' />
                 <Column title='Room' dataIndex='room' key='room' />
@@ -70,7 +70,7 @@ export default class Classes extends Component {
                 <Column title="Action" key="action"
                     render={(text, record) => (
                         <Space size="middle">
-                            <Link to='/admin/sessions'>View sessions</Link>
+                            <Link to={`/admin/sessions/${record.id}`}>View sessions</Link>
                             <a href='/delete'>Delete</a>
                         </Space>
                     )}
@@ -159,7 +159,6 @@ export default class Classes extends Component {
                             />
                         </Input.Group>
                     </Form.Item>
-
                 </Form>
             </Modal>
         )

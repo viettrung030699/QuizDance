@@ -23,7 +23,7 @@ class Management extends React.Component {
             <Switch>
               <Route path={`${path}`} exact component={()=><h1>This will be the dashboard</h1>} />
               <Route path={`${path}/classes`} exact component={Classes} />
-              <Route path={`${path}/sessions`} exact component={Sessions} />
+              <Route path={`${path}/sessions/:classId`} exact component={Sessions} />
               <Route path={`${path}/reports`} exact />
             </Switch>
           </Content>
