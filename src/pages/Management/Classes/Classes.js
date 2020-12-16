@@ -20,12 +20,13 @@ export default class Classes extends Component {
     state = {
         classData: [],
         loading: false,
-        isModalOpen: false
+        isModalOpen: false,
+        isEditing: false,
+        editClassData: {},
+        editClassId: ''
     }
 
-    componentDidMount() {
-        this.fetchData()
-    }
+    componentDidMount() { this.fetchData() }
 
     fetchData = async () => {
         this.setState({ loading: true })
@@ -33,13 +34,41 @@ export default class Classes extends Component {
         this.setState({ classData: result.data, loading: false })
     }
 
-    toggleModal = () => {
-        this.setState({ isModalOpen: !this.state.isModalOpen })
+    toggleModal = (isEditing = false, classId = null) => {
+        if (isEditing) {
+            const editingClass = this.state.classData.find(aclass => aclass.id === classId)
+            console.log(editingClass)
+            this.setState({
+                isModalOpen: !this.state.isModalOpen,
+                isEditing: isEditing,
+                editClassData: editingClass,
+                editClassId: classId
+            })
+        } else {
+            this.setState({
+                isModalOpen: !this.state.isModalOpen,
+                isEditing: isEditing
+            })
+        }
     }
 
     onFinish = (values) => {
         console.log('Success:', values)
-        this.toggleModal()
+        if (this.state.isEditing) {
+            API.put(`/edit-class/${values.id}`, values)
+                .then(result => {
+                    this.toggleModal()
+                    this.fetchData()
+                })
+                .catch(err => this.onFinishFailed(err))
+        } else {
+            API.post('/new-class', { ...values, lecturerId: '17067' })
+                .then(result => {
+                    this.toggleModal()
+                    this.fetchData()
+                })
+                .catch(err => this.onFinishFailed(err))
+        }
     };
 
     onFinishFailed = (errorInfo) => {
@@ -47,7 +76,7 @@ export default class Classes extends Component {
     };
 
     render() {
-        const { classData, loading, isModalOpen } = this.state
+        const { classData, loading, isModalOpen, editClassData, isEditing } = this.state
         const table = (
             <Table dataSource={classData} loading={loading} pagination={true} rowKey='id'>
                 <Column title='Class Id' dataIndex='id' key='id' />
@@ -71,14 +100,16 @@ export default class Classes extends Component {
                     render={(text, record) => (
                         <Space size="middle">
                             <Link to={`/admin/sessions/${record.id}`}>View sessions</Link>
+                            <Button type='link' onClick={() => this.toggleModal(true, record.id)}>Edit Class</Button>
                             <a href='/delete'>Delete</a>
                         </Space>
                     )}
                 />
             </Table>
         )
+
         const form = (
-            <Modal title='Create New Classes' visible={isModalOpen}
+            <Modal title={isEditing ? 'Update Class' : 'Create New Classes'} visible={isModalOpen} onCancel={this.toggleModal}
                 footer={[
                     <Button onClick={this.toggleModal}>
                         Cancel
@@ -88,7 +119,12 @@ export default class Classes extends Component {
                     </Button>
                 ]}
             >
-                <Form id='classForm' layout='vertical' onFinish={this.onFinish} onFinishFailed={this.onFinishFailed}>
+                <Form
+                    initialValues={isEditing && editClassData}
+                    id='classForm' layout='vertical'
+                    onFinish={this.onFinish}
+                    onFinishFailed={this.onFinishFailed}
+                >
                     <Form.Item label='Class ID' name='id'
                         rules={[
                             {
@@ -135,7 +171,9 @@ export default class Classes extends Component {
                     </Form.Item>
                     <Form.Item label='Period'>
                         <Input.Group compact>
-                            <InputNumber style={{ width: 100, textAlign: 'center' }} placeholder="Start" />
+                            <Form.Item name='periodStart'>
+                                <InputNumber style={{ width: 100, textAlign: 'center' }} placeholder="Start" />
+                            </Form.Item>
                             <Input
                                 className="site-input-split"
                                 style={{
@@ -148,15 +186,18 @@ export default class Classes extends Component {
                                 placeholder="~"
                                 disabled
                             />
-                            <InputNumber
-                                className="site-input-right"
-                                style={{
-                                    width: 100,
-                                    textAlign: 'center',
-                                    borderLeft: '0'
-                                }}
-                                placeholder="End"
-                            />
+                            <Form.Item name='periodEnd'>
+                                <InputNumber
+                                    className="site-input-right"
+                                    style={{
+                                        width: 100,
+                                        textAlign: 'center',
+                                        borderLeft: '0'
+                                    }}
+                                    name='periodEnd'
+                                    placeholder="End"
+                                />
+                            </Form.Item>
                         </Input.Group>
                     </Form.Item>
                 </Form>
