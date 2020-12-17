@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import { Table, Space, Button, Divider, List, Modal } from 'antd'
 import Column from 'antd/lib/table/Column'
-import { CheckCircleTwoTone } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 
 import AntBreacrumb from '../../../components/Management/Breadcrumb/AntBreadcrumb'
 
@@ -26,8 +26,8 @@ class Sessions extends Component {
   fetchData = async (classId) => {
     this.setState({ loading: true })
     const result = await API.get(`/search-session-class/${classId}`)
-    const mappedResult = Object.values(result.data).map(s => s.useQuiz ? { ...s, useQuiz: "Yes" } : { ...s, useQuiz: "No" })
-    this.setState({ sessionData: mappedResult, loading: false })
+    // const mappedResult = Object.values(result.data).map(s => s.useQuiz ? { ...s, useQuiz: "Yes" } : { ...s, useQuiz: "No" })
+    this.setState({ sessionData: result.data, loading: false })
   }
 
   toggleModal = async (sessionId) => {
@@ -48,11 +48,11 @@ class Sessions extends Component {
 
     const breadcrumb = (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <AntBreacrumb 
+        <AntBreacrumb
           elements={[
-            {text: 'Admin', to: '/admin'}, 
-            {text: 'Classes', to: '/admin/classes'},
-            {text: `${this.props.match.params.classId} Sessions`}
+            { text: 'Admin', to: '/admin' },
+            { text: 'Classes', to: '/admin/classes' },
+            { text: `${this.props.match.params.classId} Sessions` }
           ]}
         />
         <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Session</Button>
@@ -66,10 +66,16 @@ class Sessions extends Component {
           defaultSortOrder='ascend'
           sorter={(a, b) => a.weekNo - b.weekNo}
         />
-        <Column title='Quiz' dataIndex='useQuiz' key='useQuiz' />
+        <Column title='Quiz' dataIndex='useQuiz' key='useQuiz'
+          render={useQuiz => useQuiz ?
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
+            : <CloseCircleTwoTone twoToneColor="#FF0000" />}
+        />
+        <Column title='Status' render={()=>"Incompleted"} />
         <Column title="Action" key="action"
           render={(text, record) => (
             <Space size="middle">
+              <Button type='link' onClick={() => {}}>Edit Session</Button>
               <Button type='link' onClick={() => this.toggleModal(record.id)}>View Question</Button>
               <a href='/delete'>Delete</a>
             </Space>

@@ -36,6 +36,7 @@ export default class Classes extends Component {
     }
 
     toggleModal = (isEditing = false, classId = null) => {
+        console.log(isEditing)
         if (isEditing) {
             const editingClass = this.state.classData.find(aclass => aclass.id === classId)
             console.log(editingClass)
@@ -54,7 +55,6 @@ export default class Classes extends Component {
     }
 
     onFinish = (values) => {
-        console.log('Success:', values)
         if (this.state.isEditing) {
             API.put(`/edit-class/${values.id}`, values)
                 .then(result => {
@@ -87,7 +87,7 @@ export default class Classes extends Component {
                         {text: 'Classes'}
                     ]}
                 />
-                <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Class</Button>
+                <Button type='primary' onClick={()=>this.toggleModal()} style={{ margin: '1rem 0' }}>Create New Class</Button>
             </div>
         )
 
