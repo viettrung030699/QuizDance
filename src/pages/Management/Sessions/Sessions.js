@@ -36,7 +36,7 @@ class Sessions extends Component {
     this.setState({ isModalOpen: !this.state.isModalOpen })
     if (sessionId !== this.state.editingSessionId) {
       this.setState({ modalLoading: true })
-      const result = await API.get(`/list-question/${sessionId}`)
+      const result = await API.get(`/session-with-questions/${sessionId}`)
       this.setState({
         editingSessionId: sessionId,
         editingSessionData: result.data,
@@ -50,22 +50,25 @@ class Sessions extends Component {
   }
 
   onFinish = (values) => {
-    console.log('finishes: ', values)
-    // if (this.state.isEditing) {
-    //   API.put(`/edit-class/${values.id}`, values)
-    //     .then(result => {
-    //       this.toggleModal()
-    //       this.fetchData()
-    //     })
-    //     .catch(err => this.onFinishFailed(err))
-    // } else {
-    //   API.post('/new-class', { ...values, lecturerId: '17067' })
-    //     .then(result => {
-    //       this.toggleModal()
-    //       this.fetchData()
-    //     })
-    //     .catch(err => this.onFinishFailed(err))
-    // }
+    const useQuiz = typeof values.questions === 'undefined' || values.questions.length === 0 ? false : true
+    const newValues = { ...values, useQuiz, classId: this.props.match.params.classId }
+    console.log(newValues)
+    if (this.state.isEditing) {
+      API.put(`/edit-class/${values.id}`, newValues)
+        .then(result => {
+          this.toggleModal()
+          this.fetchData(this.props.match.params.classId)
+        })
+        .catch(err => this.onFinishFailed(err))
+    } else {
+      API.post('/create-session-question', { ...newValues })
+        .then(result => {
+          console.log(result)
+          this.toggleModal()
+          this.fetchData(this.props.match.params.classId)
+        })
+        .catch(err => this.onFinishFailed(err))
+    }
   };
 
   onFinishFailed = (errorInfo) => {
@@ -165,9 +168,8 @@ class Sessions extends Component {
           <Form.Item label="Week Number" name='weekNo'>
             <InputNumber />
           </Form.Item>
-          <Form.Item label="Entry Timer" name='entryTimer'>
+          <Form.Item label="Entry Timer" name='entryTimer' initialValue={40}>
             <Slider
-              defaultValue={40}
               marks={{
                 0: '0',
                 20: '20',
