@@ -1,22 +1,24 @@
 import React, { Component } from 'react'
 
-import { Table, Space, Button, Divider, List, Modal } from 'antd'
+import { Table, Space, Button, Divider, List, Modal, Form, Input, InputNumber, Slider, Radio } from 'antd'
 import Column from 'antd/lib/table/Column'
-import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
 import AntBreacrumb from '../../../components/Management/Breadcrumb/AntBreadcrumb'
 
 import { API } from '../../../services/api'
+import { Fragment } from 'react';
 
 class Sessions extends Component {
   state = {
     sessionData: [],
     loading: false,
-    isModalOpen: false,
+    isModalOpen: true,
     modalLoading: false,
     isEditing: false,
-    viewedSessionId: '',
-    viewedSessionData: []
+    editingSessionId: '',
+    editingSessionData: [],
+    formUseQuiz: false
   }
 
   componentDidMount() {
@@ -32,19 +34,46 @@ class Sessions extends Component {
 
   toggleModal = async (sessionId) => {
     this.setState({ isModalOpen: !this.state.isModalOpen })
-    if (sessionId !== this.state.viewedSessionId) {
+    if (sessionId !== this.state.editingSessionId) {
       this.setState({ modalLoading: true })
       const result = await API.get(`/list-question/${sessionId}`)
       this.setState({
-        viewedSessionId: sessionId,
-        viewedSessionData: result.data,
+        editingSessionId: sessionId,
+        editingSessionData: result.data,
         modalLoading: false
       })
     }
   }
 
+  checkUseQuiz = (values) => {
+    this.setState({ formUseQuiz: values.useQuiz })
+  }
+
+  onFinish = (values) => {
+    console.log('finishes: ', values)
+    // if (this.state.isEditing) {
+    //   API.put(`/edit-class/${values.id}`, values)
+    //     .then(result => {
+    //       this.toggleModal()
+    //       this.fetchData()
+    //     })
+    //     .catch(err => this.onFinishFailed(err))
+    // } else {
+    //   API.post('/new-class', { ...values, lecturerId: '17067' })
+    //     .then(result => {
+    //       this.toggleModal()
+    //       this.fetchData()
+    //     })
+    //     .catch(err => this.onFinishFailed(err))
+    // }
+  };
+
+  onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo)
+  };
+
   render() {
-    const { sessionData, loading, isModalOpen, modalLoading, viewedSessionId, viewedSessionData } = this.state
+    const { sessionData, loading, isModalOpen, modalLoading, isEditing, editingSessionId, editingSessionData } = this.state
 
     const breadcrumb = (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -71,11 +100,11 @@ class Sessions extends Component {
             <CheckCircleTwoTone twoToneColor="#52c41a" />
             : <CloseCircleTwoTone twoToneColor="#FF0000" />}
         />
-        <Column title='Status' render={()=>"Incompleted"} />
+        <Column title='Status' render={() => "Incompleted"} />
         <Column title="Action" key="action"
           render={(text, record) => (
             <Space size="middle">
-              <Button type='link' onClick={() => {}}>Edit Session</Button>
+              <Button type='link' onClick={() => { }}>Edit Session</Button>
               <Button type='link' onClick={() => this.toggleModal(record.id)}>View Question</Button>
               <a href='/delete'>Delete</a>
             </Space>
@@ -84,28 +113,134 @@ class Sessions extends Component {
       </Table>
     )
 
-    const sessionDetail = (
-      !modalLoading &&
-      <Modal style={{ top: '0' }} width={'90%'} visible={isModalOpen} onOk={this.toggleModal} onCancel={this.toggleModal}>
-        <Divider orientation="left">{viewedSessionId} questions</Divider>
-        <List
-          grid={{ gutter: 16, column: 4 }}
-          dataSource={viewedSessionData}
-          renderItem={data => (
-            <List.Item>
-              <h6>{data.question}</h6>
-              <List
-                dataSource={data.answers}
-                renderItem={answer => (
-                  <List.Item>
-                    <p>{answer.answerText}</p>
-                    { answer.isCorrect && <CheckCircleTwoTone twoToneColor="#52c41a" />}
-                  </List.Item>
-                )}
-              />
-            </List.Item>
-          )}
-        />
+    // const sessionDetail = (
+    //   !modalLoading &&
+    //   <Modal style={{ top: '0' }} width={'90%'} visible={isModalOpen} onOk={this.toggleModal} onCancel={this.toggleModal}>
+    //     <Divider orientation="left">{editingSessionId} questions</Divider>
+    //     <List
+    //       grid={{ gutter: 16, column: 4 }}
+    //       dataSource={editingSessionData}
+    //       renderItem={data => (
+    //         <List.Item>
+    //           <h6>{data.question}</h6>
+    //           <List
+    //             dataSource={data.answers}
+    //             renderItem={answer => (
+    //               <List.Item>
+    //                 <p>{answer.answerText}</p>
+    //                 { answer.isCorrect && <CheckCircleTwoTone twoToneColor="#52c41a" />}
+    //               </List.Item>
+    //             )}
+    //           />
+    //         </List.Item>
+    //       )}
+    //     />
+    //   </Modal>
+    // )
+
+    const form = (
+      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isModalOpen} onCancel={this.toggleModal}
+        footer={[
+          <Button onClick={this.toggleModal}>
+            Cancel
+          </Button>,
+          <Button form="sessionForm" type='primary' key="submit" htmlType="submit">
+            Submit
+          </Button>
+        ]}
+      >
+        <Form
+          initialValues={isEditing && editingSessionData}
+          id='sessionForm' layout='vertical'
+          onValuesChange={this.checkUseQuiz}
+          onFinish={this.onFinish}
+          onFinishFailed={this.onFinishFailed}
+        >
+          <Form.Item name='classId' hidden>
+            <Input type='hidden' value={this.props.match.params.classId} />
+          </Form.Item>
+          {/* <Form.Item label="Session ID" name='id'>
+            <Input />
+          </Form.Item> */}
+          <Form.Item label="Week Number" name='weekNo'>
+            <InputNumber />
+          </Form.Item>
+          <Form.Item label="Entry Timer" name='entryTimer'>
+            <Slider
+              defaultValue={40}
+              marks={{
+                0: '0',
+                20: '20',
+                40: '40',
+                60: '60',
+                80: '80',
+                100: '100'
+              }}
+            />
+          </Form.Item>
+          <Form.List name='questions'>
+            {(fields, { add, remove }) => (
+              <Fragment>
+                {fields.map(field => (
+                  <Fragment>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'question']}
+                        fieldKey={[field.fieldKey, 'question']}
+                        rules={[{ required: true, message: 'Missing question' }]}
+                        style={{ width: '90%' }}
+                      >
+                        <Input placeholder="Question" />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(field.name)} />
+                    </div>
+                    <Form.List {...field} name={[field.name, 'answers']}>
+                      {(ansFields, { add, remove }) => (
+                        <Fragment>
+                          {ansFields.map(ansField => (
+                            <Space key={ansField.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                              <Form.Item
+                                {...ansField}
+                                name={[ansField.name, 'answerText']}
+                                fieldKey={[ansField.fieldKey, 'answerText']}
+                                rules={[{ required: true, message: 'Missing text' }]}
+                              >
+                                <Input placeholder="Answer" />
+                              </Form.Item>
+                              <Form.Item
+                                {...ansField}
+                                name={[ansField.name, 'isCorrect']}
+                                fieldKey={[ansField.fieldKey, 'isCorrect']}
+                              >
+                                <Radio.Group>
+                                  <Radio value={true}>True</Radio>
+                                  <Radio value={false}>False</Radio>
+                                </Radio.Group>
+                              </Form.Item>
+                              <MinusCircleOutlined onClick={() => remove(ansField.name)} />
+                            </Space>
+                          ))}
+                          {ansFields.length < 4 && <Form.Item>
+                            <Button style={{ width: '80%' }} type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                              Add answer
+                          </Button>
+                          </Form.Item>}
+                          <Divider />
+                        </Fragment>
+                      )}
+                    </Form.List>
+                  </Fragment>
+                ))}
+                <Form.Item>
+                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    Add question
+                  </Button>
+                </Form.Item>
+              </Fragment>
+            )}
+          </Form.List>
+        </Form>
       </Modal>
     )
 
@@ -113,7 +248,7 @@ class Sessions extends Component {
       <div>
         {breadcrumb}
         {table}
-        {sessionDetail}
+        {form}
       </div>
     )
   }
