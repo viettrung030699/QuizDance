@@ -45,15 +45,18 @@ class Sessions extends Component {
     const { sessionData, loading, isModalOpen, modalLoading, viewedSessionId, viewedSessionData } = this.state
 
     const breadcrumb = (
-      <Breadcrumb style={{ margin: '1rem 0' }}>
-        <Breadcrumb.Item>
-          <Link to='/admin'>Admin</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link to='/admin/classes'>Classes</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>{this.props.match.params.classId} Sessions</Breadcrumb.Item>
-      </Breadcrumb>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Breadcrumb style={{ margin: '1rem 0' }}>
+          <Breadcrumb.Item>
+            <Link to='/admin'>Admin</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to='/admin/classes'>Classes</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>{this.props.match.params.classId} Sessions</Breadcrumb.Item>
+        </Breadcrumb>
+        <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Session</Button>
+      </div>
     )
 
     const table = (
@@ -77,7 +80,7 @@ class Sessions extends Component {
 
     const sessionDetail = (
       !modalLoading &&
-      <Modal style={{ top: '0' }} width={1000} visible={isModalOpen} onOk={this.toggleModal} onCancel={this.toggleModal}>
+      <Modal style={{ top: '0' }} width={'90%'} visible={isModalOpen} onOk={this.toggleModal} onCancel={this.toggleModal}>
         <Divider orientation="left">{viewedSessionId} questions</Divider>
         <List
           grid={{ gutter: 16, column: 4 }}

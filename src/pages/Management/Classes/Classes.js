@@ -77,6 +77,19 @@ export default class Classes extends Component {
 
     render() {
         const { classData, loading, isModalOpen, editClassData, isEditing } = this.state
+
+        const header = (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Breadcrumb style={{ margin: '1rem 0' }}>
+                    <Breadcrumb.Item>
+                        <Link to='/admin'>Admin</Link>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>Classes</Breadcrumb.Item>
+                </Breadcrumb>
+                <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Class</Button>
+            </div>
+        )
+
         const table = (
             <Table dataSource={classData} loading={loading} pagination={true} rowKey='id'>
                 <Column title='Class Id' dataIndex='id' key='id' />
@@ -205,15 +218,7 @@ export default class Classes extends Component {
         )
         return (
             <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Breadcrumb style={{ margin: '1rem 0' }}>
-                        <Breadcrumb.Item>
-                            <Link to='/admin'>Admin</Link>
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>Classes</Breadcrumb.Item>
-                    </Breadcrumb>
-                    <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Class</Button>
-                </div>
+                {header}
                 {table}
                 {form}
             </div>
