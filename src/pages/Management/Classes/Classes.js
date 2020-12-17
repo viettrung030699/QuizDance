@@ -36,10 +36,8 @@ export default class Classes extends Component {
     }
 
     toggleModal = (isEditing = false, classId = null) => {
-        console.log(isEditing)
         if (isEditing) {
             const editingClass = this.state.classData.find(aclass => aclass.id === classId)
-            console.log(editingClass)
             this.setState({
                 isModalOpen: !this.state.isModalOpen,
                 isEditing: isEditing,

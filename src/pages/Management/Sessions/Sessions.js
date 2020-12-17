@@ -13,12 +13,11 @@ class Sessions extends Component {
   state = {
     sessionData: [],
     loading: false,
-    isModalOpen: true,
+    isModalOpen: false,
     modalLoading: false,
     isEditing: false,
     editingSessionId: '',
-    editingSessionData: [],
-    formUseQuiz: false
+    editingSessionData: []
   }
 
   componentDidMount() {
@@ -28,25 +27,35 @@ class Sessions extends Component {
   fetchData = async (classId) => {
     this.setState({ loading: true })
     const result = await API.get(`/search-session-class/${classId}`)
-    // const mappedResult = Object.values(result.data).map(s => s.useQuiz ? { ...s, useQuiz: "Yes" } : { ...s, useQuiz: "No" })
     this.setState({ sessionData: result.data, loading: false })
   }
 
-  toggleModal = async (sessionId) => {
-    this.setState({ isModalOpen: !this.state.isModalOpen })
-    if (sessionId !== this.state.editingSessionId) {
-      this.setState({ modalLoading: true })
-      const result = await API.get(`/session-with-questions/${sessionId}`)
+  toggleModal = async (sessionId = null, isEditing = false) => {
+    if (isEditing) {
+      if (sessionId !== this.state.editingSessionId) {
+        this.setState({ modalLoading: true })
+        const result = await API.get(`/session-with-questions/${sessionId}`)
+        this.setState({
+          isEditing: true,
+          editingSessionId: sessionId,
+          editingSessionData: result.data,
+          modalLoading: false,
+          isModalOpen: !this.state.isModalOpen
+        })
+      } else {
+        this.setState({
+          isEditing: true,
+          modalLoading: false,
+          isModalOpen: !this.state.isModalOpen
+        })
+      }
+    } else {
       this.setState({
-        editingSessionId: sessionId,
-        editingSessionData: result.data,
-        modalLoading: false
+        isModalOpen: !this.state.isModalOpen,
+        isEditing: false
       })
     }
-  }
 
-  checkUseQuiz = (values) => {
-    this.setState({ formUseQuiz: values.useQuiz })
   }
 
   onFinish = (values) => {
@@ -54,7 +63,7 @@ class Sessions extends Component {
     const newValues = { ...values, useQuiz, classId: this.props.match.params.classId }
     console.log(newValues)
     if (this.state.isEditing) {
-      API.put(`/edit-class/${values.id}`, newValues)
+      API.put(`/edit-session-question/${values.id}`, { ...newValues })
         .then(result => {
           this.toggleModal()
           this.fetchData(this.props.match.params.classId)
@@ -77,7 +86,7 @@ class Sessions extends Component {
 
   render() {
     const { sessionData, loading, isModalOpen, modalLoading, isEditing, editingSessionId, editingSessionData } = this.state
-
+    console.log(isEditing)
     const breadcrumb = (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <AntBreacrumb
@@ -107,8 +116,8 @@ class Sessions extends Component {
         <Column title="Action" key="action"
           render={(text, record) => (
             <Space size="middle">
-              <Button type='link' onClick={() => { }}>Edit Session</Button>
-              <Button type='link' onClick={() => this.toggleModal(record.id)}>View Question</Button>
+              <Button type='link' onClick={() => this.toggleModal(record.id, true)}>Edit Session</Button>
+              {/* <Button type='link' onClick={() => this.toggleModal(record.id)}>View Question</Button> */}
               <a href='/delete'>Delete</a>
             </Space>
           )}
@@ -142,9 +151,9 @@ class Sessions extends Component {
     // )
 
     const form = (
-      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isModalOpen} onCancel={this.toggleModal}
+      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isModalOpen} onCancel={() => this.toggleModal()}
         footer={[
-          <Button onClick={this.toggleModal}>
+          <Button onClick={() => this.toggleModal()}>
             Cancel
           </Button>,
           <Button form="sessionForm" type='primary' key="submit" htmlType="submit">
@@ -155,20 +164,16 @@ class Sessions extends Component {
         <Form
           initialValues={isEditing && editingSessionData}
           id='sessionForm' layout='vertical'
-          onValuesChange={this.checkUseQuiz}
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
         >
-          <Form.Item name='classId' hidden>
-            <Input type='hidden' value={this.props.match.params.classId} />
-          </Form.Item>
-          {/* <Form.Item label="Session ID" name='id'>
+          <Form.Item hidden name='id'>
             <Input />
-          </Form.Item> */}
+          </Form.Item>
           <Form.Item label="Week Number" name='weekNo'>
             <InputNumber />
           </Form.Item>
-          <Form.Item label="Entry Timer" name='entryTimer' initialValue={40}>
+          <Form.Item label="Entry Timer" name='entryTimer'>
             <Slider
               marks={{
                 0: '0',
