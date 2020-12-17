@@ -19,7 +19,6 @@ class Management extends React.Component {
         <Layout className="site-layout">
           <Header className="site-layout-background" style={{ padding: 0 }} />
           <Content style={{ margin: '0 16px' }}>
-            {/* <Classes /> */}
             <Switch>
               <Route path={`${path}`} exact component={()=><h1>This will be the dashboard</h1>} />
               <Route path={`${path}/classes`} exact component={Classes} />

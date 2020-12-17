@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
 
-import { Table, Breadcrumb, Space, Button, Divider, List, Modal } from 'antd'
+import { Table, Space, Button, Divider, List, Modal } from 'antd'
 import Column from 'antd/lib/table/Column'
 import { CheckCircleTwoTone } from '@ant-design/icons';
+
+import AntBreacrumb from '../../../components/Management/Breadcrumb/AntBreadcrumb'
 
 import { API } from '../../../services/api'
 
@@ -13,6 +14,7 @@ class Sessions extends Component {
     loading: false,
     isModalOpen: false,
     modalLoading: false,
+    isEditing: false,
     viewedSessionId: '',
     viewedSessionData: []
   }
@@ -46,15 +48,13 @@ class Sessions extends Component {
 
     const breadcrumb = (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Breadcrumb style={{ margin: '1rem 0' }}>
-          <Breadcrumb.Item>
-            <Link to='/admin'>Admin</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>
-            <Link to='/admin/classes'>Classes</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>{this.props.match.params.classId} Sessions</Breadcrumb.Item>
-        </Breadcrumb>
+        <AntBreacrumb 
+          elements={[
+            {text: 'Admin', to: '/admin'}, 
+            {text: 'Classes', to: '/admin/classes'},
+            {text: `${this.props.match.params.classId} Sessions`}
+          ]}
+        />
         <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Session</Button>
       </div>
     )

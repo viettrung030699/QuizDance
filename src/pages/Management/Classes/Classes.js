@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Table, Space, Breadcrumb, Form, Input, InputNumber, Button, Select, Modal } from 'antd'
+import { Table, Space, Form, Input, InputNumber, Button, Select, Modal } from 'antd'
 import ColumnGroup from 'antd/lib/table/ColumnGroup'
 import Column from 'antd/lib/table/Column'
 
 import { API } from '../../../services/api'
+import AntBreadcrumb from '../../../components/Management/Breadcrumb/AntBreadcrumb'
 
 const weekdayIds = {
     Monday: 2,
@@ -80,12 +81,12 @@ export default class Classes extends Component {
 
         const header = (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Breadcrumb style={{ margin: '1rem 0' }}>
-                    <Breadcrumb.Item>
-                        <Link to='/admin'>Admin</Link>
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item>Classes</Breadcrumb.Item>
-                </Breadcrumb>
+                <AntBreadcrumb 
+                    elements={[
+                        {text: 'Admin', to: '/admin'},
+                        {text: 'Classes'}
+                    ]}
+                />
                 <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Class</Button>
             </div>
         )
