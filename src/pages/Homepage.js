@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 
 //import axios from "axios";
-import { Redirect } from "react-router-dom";
+import { Redirect, useParams } from "react-router-dom";
 
 import "./Homepage.scss";
 import { Footer } from "../components/footer/FooterPage";
@@ -9,6 +9,7 @@ import axios from "axios";
 
 export const Homepage = () => {
   const [data, setData] = useState();
+  const { quizId } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +43,7 @@ export const Homepage = () => {
         <div className="enterForm">
           <Fragment>
             <form onSubmit={onLogin}>
-              <input type="text" placeholder="Quiz ID" id="gameID"></input>
+              <input type="text" placeholder="Quiz ID" id="gameID" value={quizId}></input>
               <button type="submit" className="enter-btn">
                 ENTER
               </button>

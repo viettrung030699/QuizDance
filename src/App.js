@@ -18,7 +18,7 @@ function App() {
           <Route path="/LecturerView" component={LecturerView} />
           <Route path="/Student" component={Student} />
           <Route path="/admin" component={Management} />
-          {/* <Route path="/:quizId" component={Quiz} /> */}
+          <Route path="/:quizId" component={Homepage} />
         </Switch>
       </Router>
     </div>
