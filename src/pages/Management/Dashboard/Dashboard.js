@@ -6,6 +6,7 @@ import { CheckCircleTwoTone, CloseCircleTwoTone, WarningTwoTone } from '@ant-des
 
 import AntBreadcrumb from '../../../components/Management/Breadcrumb/AntBreadcrumb';
 import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 
 const labChartData = [
   { week: 'Week 5', key: 'SPM', value: 30 },
@@ -122,7 +123,7 @@ export default class Dashboard extends Component {
         </Row>
         <Row>
           <Col span={18}>
-            <Carousel autoplay dotPosition={'right'} style={{ margin: '1.5rem', padding: '1.5rem' }}>
+            <Carousel autoplay dotPosition={'right'} style={{ padding: '1.5rem' }}>
               <Bar {...labChartConfig} />
               <Bar {...theoryChartConfig} />
             </Carousel>
@@ -130,13 +131,12 @@ export default class Dashboard extends Component {
           <Col span={6}>
             <Card style={{ height: 'auto', margin: '1.5rem', textAlign: 'center' }} title='Upcoming Class'>
               <h4>A1.606</h4>
-              <h5>Software Project Management</h5>
-              <h5>Laboratory</h5>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'baseline' }}>
+              <h5>Software Project Management Laboratory</h5>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'baseline' }}>
                 <WarningTwoTone twoToneColor='#AAAA00' />
-                <p>5 students have been absent for 2 sessions</p>
+                <p>5 absent students for 2 sessions</p>
               </div>
-              <Button type='primary' onClick={() => { }}>Open Session</Button>
+              <Button type='primary'><Link to={'/LVhUVP'}>Open Session</Link></Button>
             </Card>
           </Col>
         </Row>

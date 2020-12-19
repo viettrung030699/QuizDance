@@ -8,6 +8,7 @@ import AntMenu from '../../components/Management/Menu/AntMenu'
 import Classes from './Classes/Classes';
 import Sessions from './Sessions/Sessions';
 import Dashboard from './Dashboard/Dashboard';
+import { Quiz } from './Quiz/Quiz';
 
 const { Header, Content, Footer } = Layout;
 
@@ -34,6 +35,7 @@ class Management extends React.Component {
               <Route path={`${path}/classes`} exact component={Classes} />
               <Route path={`${path}/sessions/:classId`} exact component={Sessions} />
               <Route path={`${path}/reports`} exact component={() => <h2>Currently under development D:</h2>} />
+              <Route path={`${path}/:quizId`} exact component={Quiz} />
             </Switch>
           </Content>
           <Footer style={{ textAlign: 'center', padding: '12px 50px' }}>QuizDance ©2020 Created by SPM8</Footer>
