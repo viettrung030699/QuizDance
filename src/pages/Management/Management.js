@@ -7,6 +7,7 @@ import { Layout } from 'antd';
 import AntMenu from '../../components/Management/Menu/AntMenu'
 import Classes from './Classes/Classes';
 import Sessions from './Sessions/Sessions';
+import Dashboard from './Dashboard/Dashboard';
 
 const { Header, Content, Footer } = Layout;
 
@@ -20,10 +21,10 @@ class Management extends React.Component {
           <Header className="site-layout-background" style={{ padding: 0 }} />
           <Content style={{ margin: '0 16px' }}>
             <Switch>
-              <Route path={`${path}`} exact component={()=><h1>This will be the dashboard</h1>} />
+              <Route path={`${path}`} exact component={Dashboard} />
               <Route path={`${path}/classes`} exact component={Classes} />
               <Route path={`${path}/sessions/:classId`} exact component={Sessions} />
-              <Route path={`${path}/reports`} exact />
+              <Route path={`${path}/reports`} exact component={()=><h2>Currently under development D:</h2>} />
             </Switch>
           </Content>
           <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>

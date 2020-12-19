@@ -6,6 +6,7 @@
     "node": "10.x"
   },
   "dependencies": {
+    "@ant-design/charts": "^1.0.12",
     "@ant-design/icons": "^4.3.0",
     "@fortawesome/fontawesome-free": "^5.14.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.30",

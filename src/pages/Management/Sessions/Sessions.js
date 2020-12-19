@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { Table, Space, Button, Divider, List, Modal, Form, Input, InputNumber, Slider, Radio } from 'antd'
+import { Table, Space, Button, Divider, Modal, Form, Input, InputNumber, Slider, Radio } from 'antd'
 import Column from 'antd/lib/table/Column'
 import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
@@ -30,7 +30,7 @@ class Sessions extends Component {
     this.setState({ sessionData: result.data, loading: false })
   }
 
-  toggleModal = async (sessionId = null, isEditing = false) => {
+  toggleForm = async (sessionId = null, isEditing = false) => {
     if (isEditing) {
       if (sessionId !== this.state.editingSessionId) {
         this.setState({ modalLoading: true })
@@ -65,7 +65,7 @@ class Sessions extends Component {
     if (this.state.isEditing) {
       API.put(`/edit-session-question/${values.id}`, { ...newValues })
         .then(result => {
-          this.toggleModal()
+          this.toggleForm()
           this.fetchData(this.props.match.params.classId)
         })
         .catch(err => this.onFinishFailed(err))
@@ -73,7 +73,7 @@ class Sessions extends Component {
       API.post('/create-session-question', { ...newValues })
         .then(result => {
           console.log(result)
-          this.toggleModal()
+          this.toggleForm()
           this.fetchData(this.props.match.params.classId)
         })
         .catch(err => this.onFinishFailed(err))
@@ -85,7 +85,7 @@ class Sessions extends Component {
   };
 
   render() {
-    const { sessionData, loading, isModalOpen, modalLoading, isEditing, editingSessionId, editingSessionData } = this.state
+    const { sessionData, loading, isModalOpen, isEditing, editingSessionData } = this.state
     console.log(isEditing)
     const breadcrumb = (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -96,7 +96,7 @@ class Sessions extends Component {
             { text: `${this.props.match.params.classId} Sessions` }
           ]}
         />
-        <Button type='primary' onClick={this.toggleModal} style={{ margin: '1rem 0' }}>Create New Session</Button>
+        <Button type='primary' onClick={this.toggleForm} style={{ margin: '1rem 0' }}>Create New Session</Button>
       </div>
     )
 
@@ -116,8 +116,8 @@ class Sessions extends Component {
         <Column title="Action" key="action"
           render={(text, record) => (
             <Space size="middle">
-              <Button type='link' onClick={() => this.toggleModal(record.id, true)}>Edit Session</Button>
-              {/* <Button type='link' onClick={() => this.toggleModal(record.id)}>View Question</Button> */}
+              <Button type='link' onClick={() => this.toggleForm(record.id, true)}>Edit Session</Button>
+              {/* <Button type='link' onClick={() => this.toggleForm(record.id)}>View Question</Button> */}
               <a href='/delete'>Delete</a>
             </Space>
           )}
@@ -125,9 +125,9 @@ class Sessions extends Component {
       </Table>
     )
 
-    // const sessionDetail = (
-    //   !modalLoading &&
-    //   <Modal style={{ top: '0' }} width={'90%'} visible={isModalOpen} onOk={this.toggleModal} onCancel={this.toggleModal}>
+    // const questionList = (
+    //   !modalLoading ?
+    //   <Modal style={{ top: '0' }} width={'90%'} visible={isModalOpen} onOk={this.toggleForm} onCancel={this.toggleForm}>
     //     <Divider orientation="left">{editingSessionId} questions</Divider>
     //     <List
     //       grid={{ gutter: 16, column: 4 }}
@@ -148,12 +148,13 @@ class Sessions extends Component {
     //       )}
     //     />
     //   </Modal>
+    //   : <Modal><Spin/></Modal>
     // )
 
     const form = (
-      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isModalOpen} onCancel={() => this.toggleModal()}
+      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isModalOpen} onCancel={() => this.toggleForm()}
         footer={[
-          <Button onClick={() => this.toggleModal()}>
+          <Button onClick={() => this.toggleForm()}>
             Cancel
           </Button>,
           <Button form="sessionForm" type='primary' key="submit" htmlType="submit">
