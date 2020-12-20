@@ -6,9 +6,12 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Homepage } from "./pages/Homepage";
 import { LecturerView } from "./components/Lecturer/LecturerSite";
 import { Student } from "./components/Student/Student";
-const App = () => {
-  const [reload, setReload] = useState("true");
-  
+import Management from "./pages/Management/Management";
+// import { Quiz } from "./pages/Management/Quiz/Quiz";
+
+function App() {
+    const [reload, setReload] = useState("true");
+
   return (
     <div className="App">
       <Router>
@@ -20,6 +23,8 @@ const App = () => {
             path= {`/Doquiz:play=${reload}`}
             component={LecturerView}
           />
+          <Route path="/admin" component={Management} />
+          {/* <Route path="/:quizId" component={Homepage} /> */}
         </Switch>
       </Router>
     </div>
