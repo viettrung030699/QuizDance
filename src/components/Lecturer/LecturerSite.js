@@ -4,7 +4,7 @@ import { Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./LecturerSite.scss";
 import io from "socket.io-client";
-const socket = io("http://quizdance.herokuapp.com");
+const socket = io("https://quizdance.herokuapp.com");
 const axios = require("axios").default;
 
 export const LecturerView = () => {

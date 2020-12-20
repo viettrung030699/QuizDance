@@ -136,7 +136,7 @@ export default class Dashboard extends Component {
                 <WarningTwoTone twoToneColor='#AAAA00' />
                 <p>5 absent students for 2 sessions</p>
               </div>
-              <Button type='primary'><Link to={'/LVhUVP'}>Open Session</Link></Button>
+              <Button type='primary'><Link to={'admin/LVhUVP'}>Open Session</Link></Button>
             </Card>
           </Col>
         </Row>
