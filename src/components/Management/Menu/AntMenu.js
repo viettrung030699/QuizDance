@@ -12,7 +12,7 @@ const { Sider } = Layout
 
 class AntMenu extends Component {
   state = {
-    collapsed: false,
+    collapsed: true,
   }
 
   onCollapse = collapsed => {
