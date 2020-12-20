@@ -7,10 +7,12 @@ export default (props) => {
   return (
     <Breadcrumb style={{ margin: '1rem 0' }}>
       {
-        elements.map(element => 
-          <Breadcrumb.Item>
-            <Link to={element.to&&element.to}>{element.text}</Link>
-          </Breadcrumb.Item>  
+        elements.map(element =>
+          <Breadcrumb.Item key={element.key}>
+            {element.to ? <Link to={element.to}>{element.text}</Link>
+              : <span>{element.text}</span>
+            }
+          </Breadcrumb.Item>
         )
       }
     </Breadcrumb>

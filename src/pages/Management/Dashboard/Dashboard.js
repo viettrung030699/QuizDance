@@ -86,7 +86,6 @@ const tableData = [
 ]
 
 export default class Dashboard extends Component {
-
   render() {
     const table = (
       <Table dataSource={tableData} pagination={false} rowKey='id'>
@@ -116,8 +115,8 @@ export default class Dashboard extends Component {
         <Row>
           <AntBreadcrumb
             elements={[
-              { text: 'Admin', to: '/admin' },
-              { text: 'Dashboard' },
+              { key: 1, text: 'Admin', to: '/admin' },
+              { key: 2, text: 'Dashboard' },
             ]}
           />
         </Row>
@@ -136,7 +135,7 @@ export default class Dashboard extends Component {
                 <WarningTwoTone twoToneColor='#AAAA00' />
                 <p>5 absent students for 2 sessions</p>
               </div>
-              <Button type='primary'><Link to={'admin/LVhUVP'}>Open Session</Link></Button>
+              <Button type='primary'><Link to={'/instruct/LVhUVP'}>Open Session</Link></Button>
             </Card>
           </Col>
         </Row>
