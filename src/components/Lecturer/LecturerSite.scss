@@ -15,13 +15,26 @@
     border-radius: 15px;
     padding: 20px;
     box-shadow: 10px 10px 42px 0px rgba(0, 0, 0, 0.75);
-    display: flex;
     justify-content: space-evenly;
-
+    align-items: center;
     .score-section {
       display: flex;
+      flex-direction: column;
       font-size: 24px;
       align-items: center;
+
+      .cancel-btn {
+        background: #7cc6fe; /* fallback for old browsers */
+        border: none;
+        width: 150px;
+        height: 40px;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+        border-radius: 8px;
+      }
     }
 
     /* QUESTION/TIMER/LEFT SECTION */

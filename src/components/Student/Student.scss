@@ -1,7 +1,18 @@
 @import "../../pages/Homepage.scss";
-ul {
+.student {
+  .student-list {
     display: flex;
     flex-direction: column;
     color: #ffffff;
     text-align: center;
+    overflow: auto;
+  }
+  @include bp-small-device {
+    .context {
+      top: 10vh;
+    }
+    ol {
+      height: 400px;
+    }
+  }
 }

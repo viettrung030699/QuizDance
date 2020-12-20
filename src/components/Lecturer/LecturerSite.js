@@ -1,37 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { Modal, Button } from "react-bootstrap";
+
 import { Link } from "react-router-dom";
 import "./LecturerSite.scss";
-
+import io from "socket.io-client";
+const socket = io("http://quizdance.herokuapp.com");
 const axios = require("axios").default;
 
-const onCancel = () => {
-  localStorage.setItem("user", false);
-  console.log("finish post");
-  axios({
-    method: "post",
-    url: "https://quizdance.herokuapp.com/api/new-record/",
-    data: {
-      attendance: true,
-      quizPts: localStorage.getItem("result"),
-      studentId: localStorage.getItem("id"),
-      sessionId: localStorage.getItem("sessionId"),
-    },
-  })
-    .then(function (response) {
-      alert("Finish");
-      //console.log(response);
-      localStorage.clear();
-    })
-    .catch(console.error());
-};
 export const LecturerView = () => {
-  
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
-  const [currentTime, setSeconds] = useState(15);
+  const [currentTime, setSeconds] = useState(30);
   const [list, setList] = useState();
   const [checklist, setChecklist] = useState(false);
+  const [show, setShow] = useState(false);
+  const [leaderboard, setLeaderboard] = useState({});
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios(
@@ -48,14 +36,18 @@ export const LecturerView = () => {
     const interval = setInterval(() => {
       if (currentTime > 0) {
         setSeconds((seconds) => {
-          return seconds > 0 ? seconds - 1 : (seconds = 15);
+          if (seconds > 0) {
+            return seconds - 1;
+          } else {
+            return (seconds = list[currentQuestion].countdown);
+          }
         });
       }
     }, 1000);
     return () => clearInterval(interval);
   }, [currentTime]);
   const handleAnswerOptionClick = (isCorrect) => {
-    let time = 15;
+    let time = list[currentQuestion].countdown;
     setSeconds(time);
     const nextQuestion = currentQuestion + 1;
 
@@ -67,8 +59,41 @@ export const LecturerView = () => {
       setCurrentQuestion(nextQuestion);
     } else {
       setShowScore(true);
-      localStorage.setItem("result", score * 10);
     }
+  };
+  const onCancel = () => {
+    localStorage.setItem("user", false);
+    let dataResult = {
+      attendance: true,
+      quizPts: score * 10,
+      studentId: localStorage.getItem("id"),
+      sessionId: localStorage.getItem("sessionId"),
+    };
+    axios({
+      method: "post",
+      url: "https://quizdance.herokuapp.com/api/new-record/",
+      data: {
+        attendance: true,
+        quizPts: score * 10,
+        studentId: localStorage.getItem("id"),
+        sessionId: localStorage.getItem("sessionId"),
+      },
+    })
+      .then(function (response) {
+        alert("Finish");
+        socket.emit("Done quiz", dataResult);
+        socket.emit("Show leaderboard", localStorage.getItem("sessionId"));
+
+        socket.on("Return leaderboard", (data) => {
+          setLeaderboard(data);
+          console.log("1sa", data);
+
+          console.log("2sa", leaderboard);
+          setShow(true);
+        });
+        localStorage.clear();
+      })
+      .catch(console.error());
   };
   return (
     <div className="Lecturer-View">
@@ -77,19 +102,47 @@ export const LecturerView = () => {
       score when the user has answered all the questions */}
         {showScore ? (
           <div className="score-section">
-            You scored {score} out of {list.length}
+            <div className="score">
+              You scored {score} out of {list.length}
+            </div>
             <div className="cancel-btn">
-              <Link to="/" onClick={onCancel}>
-                Cancel
-              </Link>
+              <Link to="/">Cancel</Link>
+              <Button variant="primary" onClick={onCancel}>
+                Leaderboard
+              </Button>
+              <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                  <Modal.Title>LEADERBOARD</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <ul style={{ display: "flex", flexDirection: "column" }}>
+                    {Object.values(leaderboard).map((item, i) => (
+                      <li key={item.id}>
+                        <h3>
+                          {++i} - {item.studentId} - {item.quizPts}
+                        </h3>
+                      </li>
+                    ))}
+                  </ul>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="primary" onClick={handleClose}>
+                    <Link to="/">Close</Link>{" "}
+                  </Button>
+                </Modal.Footer>
+              </Modal>
             </div>
           </div>
         ) : checklist ? (
           <>
             <div className="question-section">
               <div className="question-count">
-                {currentTime}
                 <span>Question {currentQuestion + 1}</span>/{list.length}
+                <p>
+                  {currentTime > 0
+                    ? currentTime
+                    : list[currentQuestion].countdown}
+                </p>
               </div>
               <div className="question-text">
                 {list[currentQuestion].question}
