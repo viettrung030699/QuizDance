@@ -8,8 +8,8 @@ import "../../Homepage.scss";
 export const Quiz = () => {
   const { quizId } = useParams()
   return (
-    <div className="Homepage" style={{ width: "1277px" }}>
-      <div className="context" style={{ top: "10vh", width: "1277px" }}>
+    <div className="Homepage" >
+      <div className="context" style={{ top: "10vh"}}>
         <div className="enterForm">
           <Fragment>
             <h2>Scan this</h2>
