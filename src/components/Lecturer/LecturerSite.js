@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import "./LecturerSite.scss";
 import io from "socket.io-client";
 const socket = io("http://quizdance.herokuapp.com");
@@ -17,7 +17,9 @@ export const LecturerView = () => {
   const [show, setShow] = useState(false);
   const [leaderboard, setLeaderboard] = useState({});
 
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+  };
   const handleShow = () => setShow(true);
 
   useEffect(() => {
@@ -38,18 +40,25 @@ export const LecturerView = () => {
         setSeconds((seconds) => {
           if (seconds > 0) {
             return seconds - 1;
-          } else {
-            return (seconds = list[currentQuestion].countdown);
           }
         });
+        if (currentTime === 1) {
+          handleAnswerOptionClick(false);
+          if (currentQuestion + 1 < list.length) {
+            setCurrentQuestion(currentQuestion + 1);
+          } else {
+            setShowScore(true);
+          }
+        }
       }
     }, 1000);
     return () => clearInterval(interval);
   }, [currentTime]);
   const handleAnswerOptionClick = (isCorrect) => {
+    const nextQuestion = currentQuestion + 1;
+
     let time = list[currentQuestion].countdown;
     setSeconds(time);
-    const nextQuestion = currentQuestion + 1;
 
     if (isCorrect) {
       setScore(score + 1);
@@ -86,9 +95,6 @@ export const LecturerView = () => {
 
         socket.on("Return leaderboard", (data) => {
           setLeaderboard(data);
-          console.log("1sa", data);
-
-          console.log("2sa", leaderboard);
           setShow(true);
         });
         localStorage.clear();
@@ -106,10 +112,14 @@ export const LecturerView = () => {
               You scored {score} out of {list.length}
             </div>
             <div className="cancel-btn">
-              <Link to="/">Cancel</Link>
-              <Button variant="primary" onClick={onCancel}>
+              <Button
+                variant="primary"
+                onClick={onCancel}
+                className="cancel-btn"
+              >
                 Leaderboard
               </Button>
+
               <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                   <Modal.Title>LEADERBOARD</Modal.Title>
@@ -126,8 +136,8 @@ export const LecturerView = () => {
                   </ul>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="primary" onClick={handleClose}>
-                    <Link to="/">Close</Link>{" "}
+                  <Button onClick={handleClose}>
+                    <Link to="/" style={{color: "#ffffff"}}>Return Homepage</Link>
                   </Button>
                 </Modal.Footer>
               </Modal>
@@ -137,7 +147,9 @@ export const LecturerView = () => {
           <>
             <div className="question-section">
               <div className="question-count">
-                <span>Question {currentQuestion + 1}</span>/{list.length}
+                <span>
+                  Question {currentQuestion + 1}/{list.length}
+                </span>
                 <p>
                   {currentTime > 0
                     ? currentTime

@@ -7,6 +7,9 @@
     text-align: center;
     overflow: auto;
   }
+  a {
+    color: #ffffff;
+  }
   @include bp-small-device {
     .context {
       top: 10vh;
