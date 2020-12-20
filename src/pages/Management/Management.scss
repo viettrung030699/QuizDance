@@ -1,0 +1,14 @@
+@media (min-width : 901px) {
+  .responsive {
+    display: none;
+  }
+}
+
+@media (max-width : 900px) {
+  .non-responsive {
+    display: none;
+  }
+  .responsive {
+    display: inline;
+  }
+}

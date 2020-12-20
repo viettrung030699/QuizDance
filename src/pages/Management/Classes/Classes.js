@@ -79,13 +79,13 @@ export default class Classes extends Component {
 
         const header = (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <AntBreadcrumb 
+                <AntBreadcrumb
                     elements={[
-                        {text: 'Admin', to: '/admin'},
-                        {text: 'Classes'}
+                        { key: 1, text: 'Admin', to: '/admin' },
+                        { key: 2, text: 'Classes' }
                     ]}
                 />
-                <Button type='primary' onClick={()=>this.toggleModal()} style={{ margin: '1rem 0' }}>Create New Class</Button>
+                <Button type='primary' onClick={() => this.toggleModal()} style={{ margin: '1rem 0' }}>Create New Class</Button>
             </div>
         )
 
@@ -123,7 +123,7 @@ export default class Classes extends Component {
         const form = (
             <Modal title={isEditing ? 'Update Class' : 'Create New Classes'} visible={isModalOpen} onCancel={this.toggleModal}
                 footer={[
-                    <Button onClick={this.toggleModal}>
+                    <Button onClick={this.toggleModal} key='cancel'>
                         Cancel
                     </Button>,
                     <Button form="classForm" type='primary' key="submit" htmlType="submit">

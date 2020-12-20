@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { Table, Space, Button, Divider, Modal, Form, Input, InputNumber, Slider, Radio } from 'antd'
+import { Table, Space, Button, Divider, Modal, Form, Input, InputNumber, Slider, Radio, List } from 'antd'
 import Column from 'antd/lib/table/Column'
 import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
@@ -13,11 +13,14 @@ class Sessions extends Component {
   state = {
     sessionData: [],
     loading: false,
-    isModalOpen: false,
-    modalLoading: false,
+    isFormOpen: false,
+    formLoading: false,
     isEditing: false,
     editingSessionId: '',
-    editingSessionData: []
+    editingSessionData: [],
+    isDetailOpen: false,
+    viewSessionId: '',
+    viewSessionData: []
   }
 
   componentDidMount() {
@@ -33,29 +36,45 @@ class Sessions extends Component {
   toggleForm = async (sessionId = null, isEditing = false) => {
     if (isEditing) {
       if (sessionId !== this.state.editingSessionId) {
-        this.setState({ modalLoading: true })
+        this.setState({ formLoading: true })
         const result = await API.get(`/session-with-questions/${sessionId}`)
         this.setState({
           isEditing: true,
           editingSessionId: sessionId,
           editingSessionData: result.data,
-          modalLoading: false,
-          isModalOpen: !this.state.isModalOpen
+          formLoading: false,
+          isFormOpen: !this.state.isFormOpen
         })
       } else {
         this.setState({
           isEditing: true,
-          modalLoading: false,
-          isModalOpen: !this.state.isModalOpen
+          formLoading: false,
+          isFormOpen: !this.state.isFormOpen
         })
       }
     } else {
       this.setState({
-        isModalOpen: !this.state.isModalOpen,
+        isFormOpen: !this.state.isFormOpen,
         isEditing: false
       })
     }
+  }
 
+  toggleDetail = async (sessionId = null) => {
+    if (sessionId !== this.state.viewSessionId) {
+      const result = await API.get(`/list-question/${sessionId}`)
+      this.setState({
+        viewSessionId: sessionId,
+        viewSessionData: result.data,
+        isDetailOpen: !this.state.isDetailOpen,
+        isFormOpen: false
+      })
+    } else {
+      this.setState({
+        isDetailOpen: !this.state.isDetailOpen,
+        isFormOpen: false
+      })
+    }
   }
 
   onFinish = (values) => {
@@ -85,15 +104,14 @@ class Sessions extends Component {
   };
 
   render() {
-    const { sessionData, loading, isModalOpen, isEditing, editingSessionData } = this.state
-    console.log(isEditing)
+    const { sessionData, loading, isFormOpen, isEditing, editingSessionData, isDetailOpen, viewSessionData, viewSessionId } = this.state
     const breadcrumb = (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <AntBreacrumb
           elements={[
-            { text: 'Admin', to: '/admin' },
-            { text: 'Classes', to: '/admin/classes' },
-            { text: `${this.props.match.params.classId} Sessions` }
+            { key: 1, text: 'Admin', to: '/admin' },
+            { key: 2, text: 'Classes', to: '/admin/classes' },
+            { key: 3, text: `${this.props.match.params.classId} Sessions` }
           ]}
         />
         <Button type='primary' onClick={this.toggleForm} style={{ margin: '1rem 0' }}>Create New Session</Button>
@@ -116,8 +134,8 @@ class Sessions extends Component {
         <Column title="Action" key="action"
           render={(text, record) => (
             <Space size="middle">
-              <Button type='link' onClick={() => this.toggleForm(record.id, true)}>Edit Session</Button>
-              {/* <Button type='link' onClick={() => this.toggleForm(record.id)}>View Question</Button> */}
+              {/* <Button type='link' onClick={() => this.toggleForm(record.id, true)}>Edit Session</Button> */}
+              <Button type='link' onClick={() => this.toggleDetail(record.id)}>View Question</Button>
               <a href='/delete'>Delete</a>
             </Space>
           )}
@@ -125,36 +143,34 @@ class Sessions extends Component {
       </Table>
     )
 
-    // const questionList = (
-    //   !modalLoading ?
-    //   <Modal style={{ top: '0' }} width={'90%'} visible={isModalOpen} onOk={this.toggleForm} onCancel={this.toggleForm}>
-    //     <Divider orientation="left">{editingSessionId} questions</Divider>
-    //     <List
-    //       grid={{ gutter: 16, column: 4 }}
-    //       dataSource={editingSessionData}
-    //       renderItem={data => (
-    //         <List.Item>
-    //           <h6>{data.question}</h6>
-    //           <List
-    //             dataSource={data.answers}
-    //             renderItem={answer => (
-    //               <List.Item>
-    //                 <p>{answer.answerText}</p>
-    //                 { answer.isCorrect && <CheckCircleTwoTone twoToneColor="#52c41a" />}
-    //               </List.Item>
-    //             )}
-    //           />
-    //         </List.Item>
-    //       )}
-    //     />
-    //   </Modal>
-    //   : <Modal><Spin/></Modal>
-    // )
+    const questionList = (
+      <Modal style={{ top: '5' }} width={'90%'} visible={isDetailOpen} onOk={this.toggleDetail} onCancel={this.toggleDetail}>
+        <Divider orientation="left">{viewSessionId} questions</Divider>
+        <List
+          grid={{ gutter: 16, column: 4 }}
+          dataSource={viewSessionData}
+          renderItem={data => (
+            <List.Item>
+              <h6>{data.question}</h6>
+              <List
+                dataSource={data.answers}
+                renderItem={answer => (
+                  <List.Item>
+                    <p>{answer.answerText}</p>
+                    { answer.isCorrect && <CheckCircleTwoTone twoToneColor="#52c41a" />}
+                  </List.Item>
+                )}
+              />
+            </List.Item>
+          )}
+        />
+      </Modal>
+    )
 
     const form = (
-      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isModalOpen} onCancel={() => this.toggleForm()}
+      <Modal title={isEditing ? 'Update Session' : 'Create New Session'} visible={isFormOpen} onCancel={() => this.toggleForm()}
         footer={[
-          <Button onClick={() => this.toggleForm()}>
+          <Button onClick={() => this.toggleForm()} key='cancel'>
             Cancel
           </Button>,
           <Button form="sessionForm" type='primary' key="submit" htmlType="submit">
@@ -257,6 +273,7 @@ class Sessions extends Component {
         {breadcrumb}
         {table}
         {form}
+        {questionList}
       </div>
     )
   }
