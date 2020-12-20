@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./LecturerSite.scss";
 import io from "socket.io-client";
 const socket = io("http://quizdance.herokuapp.com");
